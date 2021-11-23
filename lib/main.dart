@@ -174,33 +174,13 @@ class _BoardState extends State<Board> {
   Node n14 = Node(0, null, null, null, null, CommonData.elementWidth);
   Node n15 = Node(0, null, null, null, null, CommonData.elementWidth);
 
-  List<Node> nodes = [];
+  List<Node> nodesForVerticalMovement = [];
+  List<Node> nodesForhorizontalMovement = [];
   List<int> baseValues = [2, 2, 2, 2, 4, 4, 4, 8, 8, 16];
 
-  generateGameMatrix() async {
+  generateGameMatrix() {
     setState(() {
-      /*
-      n0 = Node(0, null, null, null, null, innerBoxDimention);
-      n1 = Node(0, null, null, null, null, innerBoxDimention);
-      n2 = Node(0, null, null, null, null, innerBoxDimention);
-      n3 = Node(0, null, null, null, null, innerBoxDimention);
-
-      n4 = Node(0, null, null, null, null, innerBoxDimention);
-      n5 = Node(0, null, null, null, null, innerBoxDimention);
-      n6 = Node(0, null, null, null, null, innerBoxDimention);
-      n7 = Node(0, null, null, null, null, innerBoxDimention);
-
-      n8 = Node(0, null, null, null, null, innerBoxDimention);
-      n9 = Node(0, null, null, null, null, innerBoxDimention);
-      n10 = Node(0, null, null, null, null, innerBoxDimention);
-      n11 = Node(0, null, null, null, null, innerBoxDimention);
-
-      n12 = Node(0, null, null, null, null, innerBoxDimention);
-      n13 = Node(0, null, null, null, null, innerBoxDimention);
-      n14 = Node(0, null, null, null, null, innerBoxDimention);
-      n15 = Node(0, null, null, null, null, innerBoxDimention);
-      */
-      nodes = [
+      nodesForVerticalMovement = [
         n0,
         n1,
         n2,
@@ -216,6 +196,25 @@ class _BoardState extends State<Board> {
         n12,
         n13,
         n14,
+        n15
+      ];
+
+      nodesForhorizontalMovement = [
+        n0,
+        n4,
+        n8,
+        n12,
+        n1,
+        n5,
+        n9,
+        n13,
+        n2,
+        n6,
+        n10,
+        n14,
+        n3,
+        n7,
+        n11,
         n15
       ];
 
@@ -283,7 +282,7 @@ class _BoardState extends State<Board> {
       n15.up = n11;
       n15.left = n14;
 
-      nodes[Random().nextInt(15)].value = 2;
+      nodesForVerticalMovement[Random().nextInt(15)].value = 2;
     });
   }
 
@@ -347,11 +346,11 @@ class _BoardState extends State<Board> {
       child: GestureDetector(
         onVerticalDragEnd: (details) {
           if (details.primaryVelocity! > 0) {
-            for (Node node in nodes) {
+            for (Node node in nodesForVerticalMovement.reversed) {
               moveDown(node);
             }
             List<Node> freeNodes = [];
-            for (Node node in nodes) {
+            for (Node node in nodesForVerticalMovement) {
               if (node.value == 0) {
                 freeNodes.add(node);
               }
@@ -363,11 +362,11 @@ class _BoardState extends State<Board> {
                   baseValues[Random().nextInt(baseValues.length)];
             }
           } else {
-            for (Node node in nodes) {
+            for (Node node in nodesForVerticalMovement) {
               moveUp(node);
             }
             List<Node> freeNodes = [];
-            for (Node node in nodes) {
+            for (Node node in nodesForVerticalMovement) {
               if (node.value == 0) {
                 freeNodes.add(node);
               }
@@ -382,11 +381,11 @@ class _BoardState extends State<Board> {
         },
         onHorizontalDragEnd: (details) {
           if (details.primaryVelocity! > 0) {
-            for (Node node in nodes) {
+            for (Node node in nodesForhorizontalMovement.reversed) {
               moveRight(node);
             }
             List<Node> freeNodes = [];
-            for (Node node in nodes) {
+            for (Node node in nodesForVerticalMovement) {
               if (node.value == 0) {
                 freeNodes.add(node);
               }
@@ -398,11 +397,11 @@ class _BoardState extends State<Board> {
                   baseValues[Random().nextInt(baseValues.length)];
             }
           } else {
-            for (Node node in nodes) {
+            for (Node node in nodesForhorizontalMovement) {
               moveLeft(node);
             }
             List<Node> freeNodes = [];
-            for (Node node in nodes) {
+            for (Node node in nodesForVerticalMovement) {
               if (node.value == 0) {
                 freeNodes.add(node);
               }
