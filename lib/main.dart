@@ -48,6 +48,17 @@ class _MainGameScreenState extends State<MainGameScreen> {
     });
   }
 
+  setScoreToZero() {
+    setState(() {
+      score = 0;
+    });
+  }
+
+  saveHighestScore() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setInt('highestScore', highestScore);
+  }
+
   getScores() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -84,7 +95,7 @@ class _MainGameScreenState extends State<MainGameScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -145,11 +156,16 @@ class _MainGameScreenState extends State<MainGameScreen> {
                 ],
               ),
             ),
-            const Spacer(),
-            Board(
-              updateScore: updateScore,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(top: 32.0),
+                child: Board(
+                  updateScore: updateScore,
+                  saveHighestScore: saveHighestScore,
+                  setScoreToZero: setScoreToZero,
+                ),
+              ),
             ),
-            const Spacer(flex: 2),
           ],
         ),
       ),
@@ -159,7 +175,14 @@ class _MainGameScreenState extends State<MainGameScreen> {
 
 class Board extends StatefulWidget {
   final Function(int) updateScore;
-  const Board({Key? key, required this.updateScore}) : super(key: key);
+  final Function() saveHighestScore;
+  final Function() setScoreToZero;
+  const Board({
+    Key? key,
+    required this.updateScore,
+    required this.saveHighestScore,
+    required this.setScoreToZero,
+  }) : super(key: key);
 
   @override
   _BoardState createState() => _BoardState();
@@ -190,9 +213,27 @@ class _BoardState extends State<Board> {
   List<Node> nodesForhorizontalMovement = [];
   List<int> baseValues = [2, 2, 2, 2, 4, 4, 4, 8, 8, 16];
 
-  bool endGame = false;
+  bool isGameOver = false;
 
   generateGameMatrix() {
+    n0 = Node(0, null, null, null, null, CommonData.elementWidth);
+    n1 = Node(0, null, null, null, null, CommonData.elementWidth);
+    n2 = Node(0, null, null, null, null, CommonData.elementWidth);
+    n3 = Node(0, null, null, null, null, CommonData.elementWidth);
+
+    n4 = Node(0, null, null, null, null, CommonData.elementWidth);
+    n5 = Node(0, null, null, null, null, CommonData.elementWidth);
+    n6 = Node(0, null, null, null, null, CommonData.elementWidth);
+    n7 = Node(0, null, null, null, null, CommonData.elementWidth);
+    n8 = Node(0, null, null, null, null, CommonData.elementWidth);
+    n9 = Node(0, null, null, null, null, CommonData.elementWidth);
+    n10 = Node(0, null, null, null, null, CommonData.elementWidth);
+    n11 = Node(0, null, null, null, null, CommonData.elementWidth);
+
+    n12 = Node(0, null, null, null, null, CommonData.elementWidth);
+    n13 = Node(0, null, null, null, null, CommonData.elementWidth);
+    n14 = Node(0, null, null, null, null, CommonData.elementWidth);
+    n15 = Node(0, null, null, null, null, CommonData.elementWidth);
     setState(() {
       nodesForVerticalMovement = [
         n0,
@@ -407,145 +448,180 @@ class _BoardState extends State<Board> {
         }
       }
     }
-
-    setState(() {
-      if (endGameCheck1 && endGameCheck2) {
-        endGame = true;
-        print('============GAME END============');
-      }
-    });
+    if (endGameCheck1 && endGameCheck2) {
+      widget.saveHighestScore();
+      setState(() {
+        isGameOver = true;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: GestureDetector(
-        onVerticalDragEnd: (details) {
-          if (details.primaryVelocity! > 0) {
-            for (Node node in nodesForVerticalMovement) {
-              node.alreadyCombined = false;
-            }
-            for (Node node in nodesForVerticalMovement.reversed) {
-              moveDown(node);
-            }
-            List<Node> freeNodes = [];
-            for (Node node in nodesForVerticalMovement) {
-              if (node.value == 0) {
-                freeNodes.add(node);
+      child: Column(
+        children: [
+          GestureDetector(
+            onVerticalDragEnd: (details) {
+              if (details.primaryVelocity! > 0) {
+                for (Node node in nodesForVerticalMovement) {
+                  node.alreadyCombined = false;
+                }
+                for (Node node in nodesForVerticalMovement.reversed) {
+                  moveDown(node);
+                }
+                List<Node> freeNodes = [];
+                for (Node node in nodesForVerticalMovement) {
+                  if (node.value == 0) {
+                    freeNodes.add(node);
+                  }
+                }
+                if (freeNodes.isEmpty) {
+                  checkGameState();
+                } else {
+                  freeNodes[Random().nextInt(freeNodes.length)].value =
+                      baseValues[Random().nextInt(baseValues.length)];
+                }
+              } else {
+                for (Node node in nodesForVerticalMovement) {
+                  node.alreadyCombined = false;
+                }
+                for (Node node in nodesForVerticalMovement) {
+                  moveUp(node);
+                }
+                List<Node> freeNodes = [];
+                for (Node node in nodesForVerticalMovement) {
+                  if (node.value == 0) {
+                    freeNodes.add(node);
+                  }
+                }
+                if (freeNodes.isEmpty) {
+                  checkGameState();
+                } else {
+                  freeNodes[Random().nextInt(freeNodes.length)].value =
+                      baseValues[Random().nextInt(baseValues.length)];
+                }
               }
-            }
-            if (freeNodes.isEmpty) {
-              checkGameState();
-            } else {
-              freeNodes[Random().nextInt(freeNodes.length)].value =
-                  baseValues[Random().nextInt(baseValues.length)];
-            }
-          } else {
-            for (Node node in nodesForVerticalMovement) {
-              node.alreadyCombined = false;
-            }
-            for (Node node in nodesForVerticalMovement) {
-              moveUp(node);
-            }
-            List<Node> freeNodes = [];
-            for (Node node in nodesForVerticalMovement) {
-              if (node.value == 0) {
-                freeNodes.add(node);
+            },
+            onHorizontalDragEnd: (details) {
+              if (details.primaryVelocity! > 0) {
+                for (Node node in nodesForVerticalMovement) {
+                  node.alreadyCombined = false;
+                }
+                for (Node node in nodesForhorizontalMovement.reversed) {
+                  moveRight(node);
+                }
+                List<Node> freeNodes = [];
+                for (Node node in nodesForVerticalMovement) {
+                  if (node.value == 0) {
+                    freeNodes.add(node);
+                  }
+                }
+                if (freeNodes.isEmpty) {
+                  checkGameState();
+                } else {
+                  freeNodes[Random().nextInt(freeNodes.length)].value =
+                      baseValues[Random().nextInt(baseValues.length)];
+                }
+              } else {
+                for (Node node in nodesForVerticalMovement) {
+                  node.alreadyCombined = false;
+                }
+                for (Node node in nodesForhorizontalMovement) {
+                  moveLeft(node);
+                }
+                List<Node> freeNodes = [];
+                for (Node node in nodesForVerticalMovement) {
+                  if (node.value == 0) {
+                    freeNodes.add(node);
+                  }
+                }
+                if (freeNodes.isEmpty) {
+                  checkGameState();
+                } else {
+                  freeNodes[Random().nextInt(freeNodes.length)].value =
+                      baseValues[Random().nextInt(baseValues.length)];
+                }
               }
-            }
-            if (freeNodes.isEmpty) {
-              checkGameState();
-            } else {
-              freeNodes[Random().nextInt(freeNodes.length)].value =
-                  baseValues[Random().nextInt(baseValues.length)];
-            }
-          }
-        },
-        onHorizontalDragEnd: (details) {
-          if (details.primaryVelocity! > 0) {
-            for (Node node in nodesForVerticalMovement) {
-              node.alreadyCombined = false;
-            }
-            for (Node node in nodesForhorizontalMovement.reversed) {
-              moveRight(node);
-            }
-            List<Node> freeNodes = [];
-            for (Node node in nodesForVerticalMovement) {
-              if (node.value == 0) {
-                freeNodes.add(node);
-              }
-            }
-            if (freeNodes.isEmpty) {
-              checkGameState();
-            } else {
-              freeNodes[Random().nextInt(freeNodes.length)].value =
-                  baseValues[Random().nextInt(baseValues.length)];
-            }
-          } else {
-            for (Node node in nodesForVerticalMovement) {
-              node.alreadyCombined = false;
-            }
-            for (Node node in nodesForhorizontalMovement) {
-              moveLeft(node);
-            }
-            List<Node> freeNodes = [];
-            for (Node node in nodesForVerticalMovement) {
-              if (node.value == 0) {
-                freeNodes.add(node);
-              }
-            }
-            if (freeNodes.isEmpty) {
-              checkGameState();
-            } else {
-              freeNodes[Random().nextInt(freeNodes.length)].value =
-                  baseValues[Random().nextInt(baseValues.length)];
-            }
-          }
-        },
-        child: Container(
-          height: CommonData.frameWidth,
-          width: CommonData.frameWidth,
-          decoration: BoxDecoration(
-            color: const Color(0xff9c948c),
-            borderRadius: BorderRadius.circular(8),
+            },
+            child: Container(
+              height: CommonData.frameWidth,
+              width: CommonData.frameWidth,
+              decoration: BoxDecoration(
+                color: const Color(0xff9c948c),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      n0.project,
+                      n1.project,
+                      n2.project,
+                      n3.project,
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      n4.project,
+                      n5.project,
+                      n6.project,
+                      n7.project,
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      n8.project,
+                      n9.project,
+                      n10.project,
+                      n11.project,
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      n12.project,
+                      n13.project,
+                      n14.project,
+                      n15.project,
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  n0.project,
-                  n1.project,
-                  n2.project,
-                  n3.project,
-                ],
-              ),
-              Row(
-                children: [
-                  n4.project,
-                  n5.project,
-                  n6.project,
-                  n7.project,
-                ],
-              ),
-              Row(
-                children: [
-                  n8.project,
-                  n9.project,
-                  n10.project,
-                  n11.project,
-                ],
-              ),
-              Row(
-                children: [
-                  n12.project,
-                  n13.project,
-                  n14.project,
-                  n15.project,
-                ],
-              ),
-            ],
-          ),
-        ),
+          isGameOver
+              ? Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Center(
+                    child: InkWell(
+                      onTap: () {
+                        generateGameMatrix();
+                        widget.setScoreToZero();
+                        setState(() {
+                          isGameOver = false;
+                        });
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xffbbad9f),
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Text(
+                            'Restart',
+                            style: GoogleFonts.pressStart2p(
+                              color: const Color(0xfff7f4e7),
+                              fontSize: 28,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              : const Spacer(flex: 2),
+        ],
       ),
     );
   }
