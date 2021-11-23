@@ -39,6 +39,15 @@ class _MainGameScreenState extends State<MainGameScreen> {
   int score = 0;
   int highestScore = 0;
 
+  updateScore(int newScore) {
+    setState(() {
+      score += newScore;
+      if (score > highestScore) {
+        highestScore = score;
+      }
+    });
+  }
+
   getScores() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
@@ -137,7 +146,9 @@ class _MainGameScreenState extends State<MainGameScreen> {
               ),
             ),
             const Spacer(),
-            const Board(),
+            Board(
+              updateScore: updateScore,
+            ),
             const Spacer(flex: 2),
           ],
         ),
@@ -147,7 +158,8 @@ class _MainGameScreenState extends State<MainGameScreen> {
 }
 
 class Board extends StatefulWidget {
-  const Board({Key? key}) : super(key: key);
+  final Function(int) updateScore;
+  const Board({Key? key, required this.updateScore}) : super(key: key);
 
   @override
   _BoardState createState() => _BoardState();
@@ -300,6 +312,14 @@ class _BoardState extends State<Board> {
           currNode.value = 0;
           moveUp(currNode.up!);
         }
+        if (currNode.up!.value == currNode.value &&
+            currNode.value != 0 &&
+            currNode.up!.alreadyCombined == false) {
+          currNode.up!.value += currNode.value;
+          currNode.value = 0;
+          currNode.up!.alreadyCombined = true;
+          widget.updateScore(currNode.up!.value);
+        }
       }
     });
   }
@@ -311,6 +331,14 @@ class _BoardState extends State<Board> {
           currNode.down!.value = currNode.value;
           currNode.value = 0;
           moveDown(currNode.down!);
+        }
+        if (currNode.down!.value == currNode.value &&
+            currNode.value != 0 &&
+            currNode.down!.alreadyCombined == false) {
+          currNode.down!.value += currNode.value;
+          currNode.value = 0;
+          currNode.down!.alreadyCombined = true;
+          widget.updateScore(currNode.down!.value);
         }
       }
     });
@@ -324,6 +352,14 @@ class _BoardState extends State<Board> {
           currNode.value = 0;
           moveLeft(currNode.left!);
         }
+        if (currNode.left!.value == currNode.value &&
+            currNode.value != 0 &&
+            currNode.left!.alreadyCombined == false) {
+          currNode.left!.value += currNode.value;
+          currNode.value = 0;
+          currNode.left!.alreadyCombined = true;
+          widget.updateScore(currNode.left!.value);
+        }
       }
     });
   }
@@ -336,6 +372,14 @@ class _BoardState extends State<Board> {
           currNode.value = 0;
           moveRight(currNode.right!);
         }
+        if (currNode.right!.value == currNode.value &&
+            currNode.value != 0 &&
+            currNode.right!.alreadyCombined == false) {
+          currNode.right!.value += currNode.value;
+          currNode.value = 0;
+          currNode.right!.alreadyCombined = true;
+          widget.updateScore(currNode.right!.value);
+        }
       }
     });
   }
@@ -346,6 +390,9 @@ class _BoardState extends State<Board> {
       child: GestureDetector(
         onVerticalDragEnd: (details) {
           if (details.primaryVelocity! > 0) {
+            for (Node node in nodesForVerticalMovement) {
+              node.alreadyCombined = false;
+            }
             for (Node node in nodesForVerticalMovement.reversed) {
               moveDown(node);
             }
@@ -362,6 +409,9 @@ class _BoardState extends State<Board> {
                   baseValues[Random().nextInt(baseValues.length)];
             }
           } else {
+            for (Node node in nodesForVerticalMovement) {
+              node.alreadyCombined = false;
+            }
             for (Node node in nodesForVerticalMovement) {
               moveUp(node);
             }
@@ -381,6 +431,9 @@ class _BoardState extends State<Board> {
         },
         onHorizontalDragEnd: (details) {
           if (details.primaryVelocity! > 0) {
+            for (Node node in nodesForVerticalMovement) {
+              node.alreadyCombined = false;
+            }
             for (Node node in nodesForhorizontalMovement.reversed) {
               moveRight(node);
             }
@@ -397,6 +450,9 @@ class _BoardState extends State<Board> {
                   baseValues[Random().nextInt(baseValues.length)];
             }
           } else {
+            for (Node node in nodesForVerticalMovement) {
+              node.alreadyCombined = false;
+            }
             for (Node node in nodesForhorizontalMovement) {
               moveLeft(node);
             }
@@ -466,6 +522,7 @@ class _BoardState extends State<Board> {
 class Node {
   int value = 0;
   final double innerBoxDimention;
+  bool? alreadyCombined;
   Node? left;
   Node? right;
   Node? up;
@@ -489,7 +546,7 @@ class Node {
             value == 0 ? '' : value.toString(),
             style: GoogleFonts.pressStart2p(
               color: const Color(0xfff7f4e7),
-              fontSize: 24,
+              fontSize: (value > 999) ? 16 : 24,
             ),
             overflow: TextOverflow.fade,
           ),
