@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audiofileplayer/audiofileplayer.dart';
 
 void main() {
   runApp(const Root());
@@ -40,6 +41,12 @@ class _MainGameScreenState extends State<MainGameScreen> {
   int highestScore = 0;
 
   updateScore(int newScore) {
+    if (CommonData.isSoundOn) {
+      Audio.load('assets/sounds/gameclick.wav')
+        ..play()
+        ..dispose();
+    }
+
     setState(() {
       score += newScore;
       if (score > highestScore) {
@@ -85,15 +92,40 @@ class _MainGameScreenState extends State<MainGameScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Text(
-                '2048',
-                style: GoogleFonts.pressStart2p(
-                  color: const Color(0xff766c63),
-                  fontSize: 36,
+            Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: Text(
+                    '2048',
+                    style: GoogleFonts.pressStart2p(
+                      color: const Color(0xff766c63),
+                      fontSize: 36,
+                    ),
+                  ),
                 ),
-              ),
+                const Spacer(),
+                Padding(
+                  padding: const EdgeInsets.only(right: 20),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xffbbad9f),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          CommonData.isSoundOn = !CommonData.isSoundOn;
+                        });
+                      },
+                      icon: CommonData.isSoundOn
+                          ? const Icon(Icons.volume_up_rounded)
+                          : const Icon(Icons.volume_off_rounded),
+                      color: const Color(0xfff7f4e7),
+                    ),
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
             Padding(
@@ -463,6 +495,12 @@ class _BoardState extends State<Board> {
         children: [
           GestureDetector(
             onVerticalDragEnd: (details) {
+              if (CommonData.isSoundOn) {
+                Audio.load('assets/sounds/retrogameclick.wav')
+                  ..play()
+                  ..dispose();
+              }
+
               if (details.primaryVelocity! > 0) {
                 for (Node node in nodesForVerticalMovement) {
                   node.alreadyCombined = false;
@@ -504,6 +542,12 @@ class _BoardState extends State<Board> {
               }
             },
             onHorizontalDragEnd: (details) {
+              if (CommonData.isSoundOn) {
+                Audio.load('assets/sounds/retrogameclick.wav')
+                  ..play()
+                  ..dispose();
+              }
+
               if (details.primaryVelocity! > 0) {
                 for (Node node in nodesForVerticalMovement) {
                   node.alreadyCombined = false;
@@ -595,6 +639,11 @@ class _BoardState extends State<Board> {
                   child: Center(
                     child: InkWell(
                       onTap: () {
+                        if (CommonData.isSoundOn) {
+                          Audio.load('assets/sounds/retrogameclick.wav')
+                            ..play()
+                            ..dispose();
+                        }
                         generateGameMatrix();
                         widget.setScoreToZero();
                         setState(() {
@@ -706,4 +755,5 @@ class Node {
 class CommonData {
   static double elementWidth = 0;
   static double frameWidth = 0;
+  static bool isSoundOn = true;
 }
