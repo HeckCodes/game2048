@@ -190,6 +190,8 @@ class _BoardState extends State<Board> {
   List<Node> nodesForhorizontalMovement = [];
   List<int> baseValues = [2, 2, 2, 2, 4, 4, 4, 8, 8, 16];
 
+  bool endGame = false;
+
   generateGameMatrix() {
     setState(() {
       nodesForVerticalMovement = [
@@ -384,6 +386,36 @@ class _BoardState extends State<Board> {
     });
   }
 
+  void checkGameState() {
+    bool endGameCheck1 = true;
+    bool endGameCheck2 = true;
+
+    for (Node node in nodesForVerticalMovement) {
+      if (node.down != null) {
+        if (node.down!.value == node.value) {
+          endGameCheck1 = false;
+          break;
+        }
+      }
+    }
+
+    for (Node node in nodesForhorizontalMovement) {
+      if (node.right != null) {
+        if (node.right!.value == node.value) {
+          endGameCheck2 = false;
+          break;
+        }
+      }
+    }
+
+    setState(() {
+      if (endGameCheck1 && endGameCheck2) {
+        endGame = true;
+        print('============GAME END============');
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -403,7 +435,7 @@ class _BoardState extends State<Board> {
               }
             }
             if (freeNodes.isEmpty) {
-              print('Game End');
+              checkGameState();
             } else {
               freeNodes[Random().nextInt(freeNodes.length)].value =
                   baseValues[Random().nextInt(baseValues.length)];
@@ -422,7 +454,7 @@ class _BoardState extends State<Board> {
               }
             }
             if (freeNodes.isEmpty) {
-              print('Game End');
+              checkGameState();
             } else {
               freeNodes[Random().nextInt(freeNodes.length)].value =
                   baseValues[Random().nextInt(baseValues.length)];
@@ -444,7 +476,7 @@ class _BoardState extends State<Board> {
               }
             }
             if (freeNodes.isEmpty) {
-              print('Game End');
+              checkGameState();
             } else {
               freeNodes[Random().nextInt(freeNodes.length)].value =
                   baseValues[Random().nextInt(baseValues.length)];
@@ -463,7 +495,7 @@ class _BoardState extends State<Board> {
               }
             }
             if (freeNodes.isEmpty) {
-              print('Game End');
+              checkGameState();
             } else {
               freeNodes[Random().nextInt(freeNodes.length)].value =
                   baseValues[Random().nextInt(baseValues.length)];
@@ -545,7 +577,7 @@ class Node {
           child: Text(
             value == 0 ? '' : value.toString(),
             style: GoogleFonts.pressStart2p(
-              color: const Color(0xfff7f4e7),
+              color: const Color(0xff3c3a32),
               fontSize: (value > 999) ? 16 : 24,
             ),
             overflow: TextOverflow.fade,
@@ -554,11 +586,44 @@ class Node {
         height: innerBoxDimention,
         width: innerBoxDimention,
         decoration: BoxDecoration(
-          color: const Color(0xffc5b6aa),
+          color: nodeColor(value),
           borderRadius: BorderRadius.circular(8),
         ),
       ),
     );
+  }
+
+  Color? nodeColor(int value) {
+    switch (value) {
+      case 2:
+        return const Color(0xffeee3dd);
+      case 4:
+        return const Color(0xffefdfc5);
+      case 8:
+        return const Color(0xffefb27b);
+      case 16:
+        return const Color(0xfff79663);
+      case 32:
+        return const Color(0xfff79000);
+      case 64:
+        return const Color(0xfff75d3b);
+      case 128:
+        return const Color(0xffedce71);
+      case 256:
+        return const Color(0xffeec652);
+      case 512:
+        return const Color(0xffefc652);
+      case 1024:
+        return const Color(0xffedc231);
+      case 2048:
+        return const Color(0xffefc233);
+      case 4096:
+        return const Color(0xff6cc90d);
+      case 8192:
+        return const Color(0xff4a8a10);
+      default:
+        return const Color(0xffd6cdc4);
+    }
   }
 }
 
