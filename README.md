@@ -1,16 +1,7 @@
-# game2048
+# 2048
 
-A new Flutter project.
+The classic 2048 game made with [Flutter](https://flutter.dev/)
 
-## Getting Started
+## Screenshots
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+![Screenshot_20211123-200058](https://user-images.githubusercontent.com/68272208/143043763-f70ea2a9-da3b-4649-824c-95a075db67a0.png)
