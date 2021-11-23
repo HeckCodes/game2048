@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:game2048/board.dart';
 import 'package:game2048/node.dart';

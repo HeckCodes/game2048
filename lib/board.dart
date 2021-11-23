@@ -44,8 +44,6 @@ class _BoardState extends State<Board> {
   List<Node> nodesForhorizontalMovement = [];
   List<int> baseValues = [2, 2, 2, 2, 4, 4, 4, 8, 8, 16];
 
-  bool isGameOver = false;
-
   generateGameMatrix() {
     setState(() {
       n0 = Node(0, null, null, null, null, CommonData.elementWidth);
@@ -281,9 +279,6 @@ class _BoardState extends State<Board> {
     }
     if (endGameCheck1 && endGameCheck2) {
       widget.saveHighestScore();
-      setState(() {
-        isGameOver = true;
-      });
     }
   }
 
@@ -434,43 +429,38 @@ class _BoardState extends State<Board> {
                 ),
               ),
             ),
-            isGameOver
-                ? Padding(
-                    padding: const EdgeInsets.all(32.0),
-                    child: Center(
-                      child: InkWell(
-                        onTap: () {
-                          if (CommonData.isSoundOn) {
-                            Audio.load('assets/sounds/retrogameclick.wav')
-                              ..play()
-                              ..dispose();
-                          }
-                          generateGameMatrix();
-                          widget.setScoreToZero();
-                          setState(() {
-                            isGameOver = false;
-                          });
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xffbbad9f),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(16.0),
-                            child: Text(
-                              'Restart',
-                              style: TextStyle(
-                                color: Color(0xfff7f4e7),
-                                fontSize: 28,
-                              ),
-                            ),
-                          ),
+            Padding(
+              padding: const EdgeInsets.all(32.0),
+              child: Center(
+                child: InkWell(
+                  onTap: () {
+                    if (CommonData.isSoundOn) {
+                      Audio.load('assets/sounds/retrogameclick.wav')
+                        ..play()
+                        ..dispose();
+                    }
+                    generateGameMatrix();
+                    widget.setScoreToZero();
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: const Color(0xffbbad9f),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Text(
+                        'Restart',
+                        style: TextStyle(
+                          color: Color(0xfff7f4e7),
+                          fontSize: 28,
                         ),
                       ),
                     ),
-                  )
-                : const SizedBox(),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),
